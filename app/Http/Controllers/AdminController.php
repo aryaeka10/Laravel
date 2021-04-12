@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Book;
+use PDF;
 
 class AdminController extends Controller
 {
@@ -95,6 +96,13 @@ public function update_book(Request $req)
         );
 
         return redirect()->route('admin.books')->with($notification);
+    }
+
+    public function print_books(){
+        $books = book::all();
+
+        $pdf = PDF::loadview('print_books', ['books' => $books]);
+        return $pdf->download('data_buku.pdf');
     }
 
 }

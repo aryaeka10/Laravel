@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Book;
 use PDF;
+use App\Exports\BooksExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
@@ -51,7 +53,7 @@ class AdminController extends Controller
         return redirect()->route('admin.books')->with($notification);
     }
 
-public function update_book(Request $req)
+    public function update_book(Request $req)
     {
         $book = Book::find($req->get('id'));
 
@@ -68,7 +70,7 @@ public function update_book(Request $req)
                 'public/cover_buku',
                 $filename
             );
-            Storage::delete('public/cover_buku/'.$req->get('old_cover'));
+            Storage::delete('public/cover_buku/' . $req->get('old_cover'));
 
             $book->cover = $filename;
         }
@@ -86,7 +88,7 @@ public function update_book(Request $req)
     {
         $book = Book::find($req->get('id'));
 
-        storage::delete('public/cover_buku/'.$req->get('old_cover'));
+        storage::delete('public/cover_buku/' . $req->get('old_cover'));
 
         $book->delete();
 
@@ -98,11 +100,16 @@ public function update_book(Request $req)
         return redirect()->route('admin.books')->with($notification);
     }
 
-    public function print_books(){
+    public function print_books()
+    {
         $books = book::all();
 
         $pdf = PDF::loadview('print_books', ['books' => $books]);
         return $pdf->download('data_buku.pdf');
     }
 
+    public function export()
+    {
+        return Excel::download(new BooksExport, 'books.xlsx');
+    }
 }
